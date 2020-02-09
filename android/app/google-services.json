@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "295683218168",
+    "firebase_url": "https://utesa-app.firebaseio.com",
+    "project_id": "utesa-app",
+    "storage_bucket": "utesa-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:295683218168:android:edafc3f07b468b411f390d",
+        "android_client_info": {
+          "package_name": "edu.utesa.midoriiro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "295683218168-escv84u4p63tm746omvfnn3urepa70lh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGXIMRhrQkxdsCdVWACeJ2lXztiMiYRIo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "295683218168-escv84u4p63tm746omvfnn3urepa70lh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
