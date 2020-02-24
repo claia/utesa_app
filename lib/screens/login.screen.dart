@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:midoriiro/models/enclosure.model.dart';
+import 'package:midoriiro/models/login.model.dart';
+import 'package:midoriiro/models/token.model.dart';
+import 'package:midoriiro/services/login.services.dart';
+import 'package:midoriiro/scripts/decodeToken.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -6,21 +12,45 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  Widget loginIcon = Row(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    children: <Widget>[Icon(Icons.send), Text('INICIAR SESION')],
-  );
+  LoginService _loginService = LoginService();
+
+  final List<Enclosure> _enclosures = [
+    Enclosure(addressesId: 1, name: 'RECINTO SANTIAGO'),
+    Enclosure(addressesId: 2, name: 'RECINTO MOCA'),
+    Enclosure(addressesId: 3, name: 'RECINTO MAO'),
+    Enclosure(addressesId: 4, name: 'RECINTO PUERTO PLATA'),
+    Enclosure(addressesId: 5, name: 'RECINTO SANTO DOMINGO DE GUZMAN'),
+    Enclosure(addressesId: 6, name: 'RECINTO GASPAR HERNANDEZ'),
+    Enclosure(addressesId: 7, name: 'RECINTO SANTO DOMINGO ORIENTAL'),
+    Enclosure(addressesId: 8, name: 'RECINTO DAJABON'),
+  ];
+
+  final _formKey = GlobalKey<FormState>();
+  final _matritulaKey = TextEditingController();
+  final _passwordKey = TextEditingController();
+
+  int _currentLocation = 1;
+  bool _isloading = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _buildBody(context),
-    );
-  }
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  Widget _buildBody(BuildContext context) {
-    return Stack(
-      children: <Widget>[_background(context), _formBox(context)],
+    return Scaffold(
+      body: Stack(
+        alignment: AlignmentDirectional.topCenter,
+        children: <Widget>[
+          _background(context),
+          SafeArea(
+              child: Center(
+                  child: SingleChildScrollView(
+                      child: Banner(
+                          location: BannerLocation.topEnd,
+                          color: Colors.red,
+                          message: "BETA",
+                          child: _formBox(context)))))
+        ],
+      ),
     );
   }
 
@@ -28,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final screenSize = MediaQuery.of(context).size;
     final sizeReference = screenSize.width;
     final background = Container(
-        height: screenSize.height * 0.4,
+        height: double.infinity,
         width: double.infinity,
         decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -63,107 +93,105 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _formBox(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
-    return SingleChildScrollView(
-      child: SafeArea(
+    return Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(5.0),
+        clipBehavior: Clip.antiAlias,
+        elevation: 8.0,
+        shadowColor: Colors.black45,
         child: Container(
-          width: screenSize.width,
-          height: screenSize.height,
-          alignment: AlignmentDirectional.center,
-          child: Container(
-            height: screenSize.height * 0.82,
-            width: screenSize.width * 0.85,
-            padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 30.0),
-            decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(5.0),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 3.0,
-                      spreadRadius: 3.0,
-                      offset: Offset(0.0, 5.0))
-                ]),
+            padding: EdgeInsets.all(20.0),
+            height: screenSize.height * 0.80,
+            width: screenSize.width * 0.90,
             child: Form(
-              child: Column(
-                children: <Widget>[
-                  Image(
-                      height: screenSize.width * 0.35,
-                      image: AssetImage('assets/logo.png'),
-                      fit: BoxFit.cover),
-                  _buildMatriculaTextField(context),
-                  _buildPasswordTextField(context),
-                  _buildOptButtonBox(context),
-                  _buildSubmitButton(context)
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+                key: _formKey,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Image.asset("assets/logo.png",
+                          width: screenSize.width * 0.5,
+                          height: screenSize.width * 0.5),
+                      TextFormField(
+                        controller: _matritulaKey,
+                        decoration: InputDecoration(
+                            icon: Icon(Icons.portrait), labelText: "Matricula"),
+                        validator: (value) {
+                          if (value.length > 0) {
+                            return null;
+                          } else {
+                            return "Ingrese Matricula";
+                          }
+                        },
+                      ),
+                      TextFormField(
+                        controller: _passwordKey,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                            icon: Icon(Icons.lock_outline),
+                            labelText: "Contraseña"),
+                        validator: (value) {
+                          if (value.length > 0) {
+                            return null;
+                          } else {
+                            return "Ingrese Contraseña";
+                          }
+                        },
+                      ),
+                      DropdownButton(
+                        isExpanded: true,
+                        value: _currentLocation,
+                        items: _enclosures
+                            .map((enclosure) => DropdownMenuItem(
+                                value: enclosure.addressesId,
+                                child: Text(
+                                  enclosure.name,
+                                  overflow: TextOverflow.ellipsis,
+                                )))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _currentLocation = value;
+                          });
+                        },
+                      ),
+                      Container(
+                        width: screenSize.width * 0.7,
+                        height: screenSize.width * 0.13,
+                        child: RaisedButton(
+                          onPressed: _isloading ? null : _login,
+                          child: _isloading
+                              ? CircularProgressIndicator()
+                              : Text("INICIAR SESIÓN"),
+                        ),
+                      )
+                    ]))));
   }
 
-  Widget _buildMatriculaTextField(BuildContext context) {
-    return Container(
-        margin: EdgeInsets.symmetric(vertical: 15.0),
-        child: TextFormField(
-          decoration: InputDecoration(
-              icon: Icon(
-                Icons.account_box,
-                color: Theme.of(context).accentColor,
-              ),
-              labelText: 'Matricula'),
-        ));
-  }
+  void _login() {
+    if (!_formKey.currentState.validate()) return;
+    setState(() {
+      _isloading = true;
+    });
 
-  Widget _buildPasswordTextField(BuildContext context) {
-    return Container(
-        margin: EdgeInsets.symmetric(vertical: 15.0),
-        child: TextFormField(
-          decoration: InputDecoration(
-              icon: Icon(
-                Icons.lock,
-                color: Theme.of(context).accentColor,
-              ),
-              labelText: 'Contraseña'),
-        ));
-  }
+    _loginService
+        .submitForm(_matritulaKey.text, _passwordKey.text, _currentLocation)
+        .then((res) {
+      if (res.statusCode == 401) {
+        showDialog(
+            context: context,
+            builder: (context) =>
+                AlertDialog(title: Text("Matricula y/o Contraseña invalida")));
+      } else if (res.statusCode == 200) {
+        String token = loginModelFromJson(res.body).token;
+        Token decode = DecodeToken.getPayload(token);
+        _loginService.addTokenDecode(decode);
+        _loginService.token = token;
+        Navigator.of(context).pushReplacementNamed("home");
+      }
 
-  Widget _buildOptButtonBox(BuildContext context) {
-    return Container(
-        child: DropdownButtonFormField(
-      decoration: InputDecoration(
-          icon: Icon(
-        Icons.location_on,
-        color: Theme.of(context).accentColor,
-      )),
-      onChanged: (opt) {},
-      items: [
-        DropdownMenuItem(
-          child: Text('Santiago'),
-        )
-      ],
-    ));
-  }
-
-  Widget _buildSubmitButton(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
-    return Container(
-      padding: EdgeInsets.only(top: 20.0),
-      width: screenSize.width * 0.6,
-      height: 70.0,
-      child: RaisedButton(
-        child: loginIcon,
-        onPressed: () {
-          setState(() {
-            loginIcon = CircularProgressIndicator();
-          });
-          Future.delayed(Duration(seconds: 3), () {
-            Navigator.of(context).pushReplacementNamed('home');
-          });
-        },
-      ),
-    );
+      setState(() {
+        _isloading = false;
+      });
+    });
   }
 }

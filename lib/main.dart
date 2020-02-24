@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 /* pantallas */
 import 'package:midoriiro/screens/home.screen.dart';
 import 'package:midoriiro/screens/login.screen.dart';
-import 'package:midoriiro/screens/second.screen.dart';
+import 'package:midoriiro/screens/notification.screen.dart';
+import 'package:midoriiro/screens/requestDocumentsScreens/requestDocuments.screen.dart';
 
 void main() => runApp(App());
 
@@ -11,15 +12,17 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: "UTESA APP",
       debugShowCheckedModeBanner: false,
       theme: _lightTheme(),
       darkTheme: _darkTheme(),
       themeMode: ThemeMode.system,
-      initialRoute: "home",
+      initialRoute: "login",
       routes: <String, WidgetBuilder>{
         "login": (context) => LoginScreen(),
         "home": (context) => HomeScreen(),
-        "second": (context) => SecondScreen()
+        "requestDocuments": (context) => RequestDocuments(),
+        "notification": (context) => NotificationScreen(),
       },
     );
   }
@@ -29,7 +32,7 @@ class App extends StatelessWidget {
         brightness: Brightness.light,
         primarySwatch: Colors.green,
         primaryColor: Colors.green[900],
-        accentColor: Colors.yellowAccent[400],
+        accentColor: Colors.yellowAccent[700],
         buttonTheme: ButtonThemeData(
             buttonColor: Colors.green[900],
             textTheme: ButtonTextTheme.primary));

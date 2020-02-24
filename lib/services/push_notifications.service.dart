@@ -1,11 +1,12 @@
-import 'dart:async';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:midoriiro/scripts/registerIdDevice.dart';
 
 class PushNotificationService {
+  final _notificationController = BehaviorSubject<Map<String, dynamic>>();
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  StreamController _notificationController =
-      StreamController<Map<String, dynamic>>.broadcast();
+
+  RegisterIdDevice _registerIdDevice = RegisterIdDevice();
 
   Stream<Map<String, dynamic>> get notificationStream =>
       _notificationController.stream;
@@ -15,7 +16,7 @@ class PushNotificationService {
   void initNotification() {
     _firebaseMessaging.requestNotificationPermissions();
     _firebaseMessaging.getToken().then((String token) {
-      print(token);
+      _registerIdDevice.setIdDevice(token);
     });
 
     _firebaseMessaging.configure(onMessage: (info) {

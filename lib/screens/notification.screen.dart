@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
-class SecondScreen extends StatelessWidget {
+class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Container(),
+      appBar: AppBar(title: Text("Notificaciones Recibidas")),
     );
   }
 }
