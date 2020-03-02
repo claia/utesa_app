@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:midoriiro/models/enclosure.model.dart';
-import 'package:midoriiro/models/login.model.dart';
-import 'package:midoriiro/models/token.model.dart';
-import 'package:midoriiro/services/login.services.dart';
-import 'package:midoriiro/scripts/decodeToken.dart';
+import 'package:midoriiro/services/login.service.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -14,15 +11,15 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   LoginService _loginService = LoginService();
 
-  final List<Enclosure> _enclosures = [
-    Enclosure(addressesId: 1, name: 'RECINTO SANTIAGO'),
-    Enclosure(addressesId: 2, name: 'RECINTO MOCA'),
-    Enclosure(addressesId: 3, name: 'RECINTO MAO'),
-    Enclosure(addressesId: 4, name: 'RECINTO PUERTO PLATA'),
-    Enclosure(addressesId: 5, name: 'RECINTO SANTO DOMINGO DE GUZMAN'),
-    Enclosure(addressesId: 6, name: 'RECINTO GASPAR HERNANDEZ'),
-    Enclosure(addressesId: 7, name: 'RECINTO SANTO DOMINGO ORIENTAL'),
-    Enclosure(addressesId: 8, name: 'RECINTO DAJABON'),
+  final List<EnclosureModel> _enclosures = [
+    EnclosureModel(addressesId: 1, name: 'RECINTO SANTIAGO'),
+    EnclosureModel(addressesId: 2, name: 'RECINTO MOCA'),
+    EnclosureModel(addressesId: 3, name: 'RECINTO MAO'),
+    EnclosureModel(addressesId: 4, name: 'RECINTO PUERTO PLATA'),
+    EnclosureModel(addressesId: 5, name: 'RECINTO SANTO DOMINGO DE GUZMAN'),
+    EnclosureModel(addressesId: 6, name: 'RECINTO GASPAR HERNANDEZ'),
+    EnclosureModel(addressesId: 7, name: 'RECINTO SANTO DOMINGO ORIENTAL'),
+    EnclosureModel(addressesId: 8, name: 'RECINTO DAJABON'),
   ];
 
   final _formKey = GlobalKey<FormState>();
@@ -114,12 +111,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextFormField(
                         controller: _matritulaKey,
                         decoration: InputDecoration(
-                            icon: Icon(Icons.portrait), labelText: "Matricula"),
+                            icon: Icon(Icons.portrait),
+                            labelText: "Matricula".toUpperCase()),
                         validator: (value) {
                           if (value.length > 0) {
                             return null;
                           } else {
-                            return "Ingrese Matricula";
+                            return "Ingrese Matricula".toUpperCase();
                           }
                         },
                       ),
@@ -128,12 +126,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: true,
                         decoration: InputDecoration(
                             icon: Icon(Icons.lock_outline),
-                            labelText: "Contraseña"),
+                            labelText: "Contraseña".toUpperCase()),
                         validator: (value) {
                           if (value.length > 0) {
                             return null;
                           } else {
-                            return "Ingrese Contraseña";
+                            return "Ingrese Contraseña".toUpperCase();
                           }
                         },
                       ),
@@ -167,31 +165,36 @@ class _LoginScreenState extends State<LoginScreen> {
                     ]))));
   }
 
-  void _login() {
+  void _login() async {
     if (!_formKey.currentState.validate()) return;
+
     setState(() {
       _isloading = true;
     });
 
-    _loginService
-        .submitForm(_matritulaKey.text, _passwordKey.text, _currentLocation)
-        .then((res) {
-      if (res.statusCode == 401) {
+    final int status = await _loginService.submit(
+        _matritulaKey.text, _passwordKey.text, _currentLocation);
+
+    switch (status) {
+      case 200:
+        Navigator.of(context).pushReplacementNamed("home");
+        break;
+      case 401:
         showDialog(
             context: context,
-            builder: (context) =>
-                AlertDialog(title: Text("Matricula y/o Contraseña invalida")));
-      } else if (res.statusCode == 200) {
-        String token = loginModelFromJson(res.body).token;
-        Token decode = DecodeToken.getPayload(token);
-        _loginService.addTokenDecode(decode);
-        _loginService.token = token;
-        Navigator.of(context).pushReplacementNamed("home");
-      }
+            builder: (context) => AlertDialog(
+                title:
+                    Text("Matricula y/o Contraseña invalida".toUpperCase())));
+        break;
+      default:
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                title: Text("No hay conexión a internet".toUpperCase())));
+    }
 
-      setState(() {
-        _isloading = false;
-      });
+    setState(() {
+      _isloading = false;
     });
   }
 }

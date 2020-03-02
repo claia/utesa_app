@@ -1,15 +1,15 @@
 // To parse this JSON data, do
 //
-class Enclosure {
+class EnclosureModel {
   int addressesId;
   String name;
 
-  Enclosure({
+  EnclosureModel({
     this.addressesId,
     this.name,
   });
 
-  factory Enclosure.fromJson(Map<String, dynamic> json) => Enclosure(
+  factory EnclosureModel.fromJson(Map<String, dynamic> json) => EnclosureModel(
         addressesId: json["addressesId"],
         name: json["name"],
       );

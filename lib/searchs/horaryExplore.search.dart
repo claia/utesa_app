@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:midoriiro/services/searchGroup.service.dart';
 
 class HoraryDataSearch extends SearchDelegate {
+  GroupService _groupService = GroupService();
+
   @override
-  final String searchFieldLabel = 'Buscar Horarios';
+  final String searchFieldLabel = 'Buscar Grupos';
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -47,6 +50,61 @@ class HoraryDataSearch extends SearchDelegate {
         ],
       );
 
-    return Container();
+    return FutureBuilder(
+      future: _groupService.searchGroups(query),
+      builder:
+          (BuildContext context, AsyncSnapshot<List<GroupModel>> snapshot) {
+        if (!snapshot.hasData) return LinearProgressIndicator();
+
+        if (snapshot.data.length <= 0)
+          return Center(
+              child: Text("No hay conexión a internet".toUpperCase()));
+
+        return ListView.separated(
+          itemCount: snapshot.data.length,
+          separatorBuilder: (context, index) => Divider(),
+          itemBuilder: (context, index) => ListTile(
+            title: Text(snapshot.data[index].nombreMateria),
+            subtitle: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                RichText(
+                    text: TextSpan(
+                        text: "CICLO: ",
+                        style: TextStyle(color: Colors.black54),
+                        children: [
+                      TextSpan(
+                          text: snapshot.data[index].ciclo,
+                          style: TextStyle(color: Colors.black87))
+                    ])),
+                RichText(
+                    text: TextSpan(
+                        text: "CLAVE: ",
+                        style: TextStyle(color: Colors.black54),
+                        children: [
+                      TextSpan(
+                          text: snapshot.data[index].claveMateria,
+                          style: TextStyle(color: Colors.black87))
+                    ])),
+                RichText(
+                    text: TextSpan(
+                        text: "DOCENTE: ",
+                        style: TextStyle(color: Colors.black54),
+                        children: [
+                      TextSpan(
+                          text: snapshot.data[index].profesor,
+                          style: TextStyle(color: Colors.black87))
+                    ])),
+              ],
+            ),
+            onTap: () {
+              Navigator.pushNamed(context, "group",
+                  arguments: snapshot.data[index]);
+            },
+          ),
+        );
+      },
+    );
   }
 }
