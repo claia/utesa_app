@@ -58,7 +58,7 @@ class HoraryDataSearch extends SearchDelegate {
 
         if (snapshot.data.length <= 0)
           return Center(
-              child: Text("No hay conexión a internet".toUpperCase()));
+              child: Text("No se pudo cargar los datos".toUpperCase()));
 
         return ListView.separated(
           itemCount: snapshot.data.length,

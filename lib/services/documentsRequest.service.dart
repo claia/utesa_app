@@ -5,8 +5,8 @@ import 'package:midoriiro/models/documentsRequest.model.dart';
 export 'package:midoriiro/models/documentsRequest.model.dart';
 
 class DocumentsRequestService {
-  String url = "https://utesawebservice.herokuapp.com";
-  // final String url = "http://10.0.0.7:8080";
+  // String url = "https://utesawebservice.herokuapp.com";
+  final String url = "http://10.0.0.7:8080";
 
   Future<List<DocumentsRequestModel>> getDocumentsRequest(int studentid) async {
     final res =

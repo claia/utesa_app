@@ -40,12 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _background(context),
           SafeArea(
               child: Center(
-                  child: SingleChildScrollView(
-                      child: Banner(
-                          location: BannerLocation.topEnd,
-                          color: Colors.red,
-                          message: "BETA",
-                          child: _formBox(context)))))
+                  child: SingleChildScrollView(child: _formBox(context))))
         ],
       ),
     );

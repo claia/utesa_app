@@ -17,6 +17,7 @@ class Payload {
   final String lastname;
   final String pensumTitle;
   final String enclosureName;
+  final List<Qualification> qualification;
   final int iat;
   final int exp;
 
@@ -28,6 +29,7 @@ class Payload {
     @required this.lastname,
     @required this.pensumTitle,
     @required this.enclosureName,
+    @required this.qualification,
     @required this.iat,
     @required this.exp,
   });
@@ -40,6 +42,8 @@ class Payload {
         lastname: json["lastname"],
         pensumTitle: json["pensum_title"],
         enclosureName: json["enclosure_name"],
+        qualification: List<Qualification>.from(
+            json["qualification"].map((x) => Qualification.fromMap(x))),
         iat: json["iat"],
         exp: json["exp"],
       );
@@ -52,7 +56,49 @@ class Payload {
         "lastname": lastname,
         "pensum_title": pensumTitle,
         "enclosure_name": enclosureName,
+        "qualification":
+            List<dynamic>.from(qualification.map((x) => x.toMap())),
         "iat": iat,
         "exp": exp,
+      };
+}
+
+class Qualification {
+  final String grupo;
+  final String materia;
+  final int the1P;
+  final dynamic the2P;
+  final dynamic the3P;
+  final dynamic nf;
+  final dynamic eq;
+
+  Qualification({
+    @required this.grupo,
+    @required this.materia,
+    @required this.the1P,
+    @required this.the2P,
+    @required this.the3P,
+    @required this.nf,
+    @required this.eq,
+  });
+
+  factory Qualification.fromMap(Map<String, dynamic> json) => Qualification(
+        grupo: json["grupo"],
+        materia: json["materia"],
+        the1P: json["1P"] == null ? null : json["1P"],
+        the2P: json["2P"],
+        the3P: json["3p"],
+        nf: json["NF"],
+        eq: json["EQ"],
+      );
+
+  Map<String, dynamic> toMap() => {
+        "grupo": grupo,
+        "materia": materia,
+        "1P": the1P == null ? null : the1P,
+        "2P": the2P,
+        "3p": the3P,
+        "NF": nf,
+        "EQ": eq,
       };
 }

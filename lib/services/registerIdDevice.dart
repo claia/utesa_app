@@ -4,8 +4,8 @@ import 'package:midoriiro/scripts/decodeToken.dart';
 
 class RegisterIdDevice {
   final _decodeToken = DecodeToken();
-  final String url = "https://utesawebservice.herokuapp.com";
-  // final String url = "http://10.0.0.7:8080";
+  // final String url = "https://utesawebservice.herokuapp.com";
+  final String url = "http://10.0.0.7:8080";
 
   setIdDevice(String code) async {
     Payload userData = await _decodeToken.getTokenPayload();

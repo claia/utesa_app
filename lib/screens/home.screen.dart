@@ -54,14 +54,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                    Icon(Icons.portrait),
+                    Icon(Icons.assignment_ind),
                     Text("Estudiante".toUpperCase())
                   ])),
               Tab(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
-                    Icon(Icons.content_paste),
+                    Icon(Icons.apps),
                     Text("servicios".toUpperCase())
                   ],
                 ),
@@ -83,17 +83,28 @@ class _HomeScreenState extends State<HomeScreen> {
         return ListView(
           children: <Widget>[
             Container(
-              padding: EdgeInsets.all(15.0),
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  _buildInformationTitle(snapshot.data),
+                  Divider(),
+                  InkWell(
+                      onTap: () {},
+                      child: _buildInformationTitle(snapshot.data)),
                   SizedBox(height: 10.0),
+                  Divider(),
+                  Text("PENSUM (84%)", textAlign: TextAlign.center),
+                  Divider(),
                   _buildInformationBody(snapshot.data)
                 ],
               ),
             ),
-            _buildQualification(snapshot.data)
+            SizedBox(height: 20.0),
+            Divider(),
+            Text("CALIFICACIONES", textAlign: TextAlign.center),
+            Divider(),
+            _buildQualification(snapshot.data),
+            SizedBox(height: 20.0)
           ],
         );
       },
@@ -111,14 +122,16 @@ class _HomeScreenState extends State<HomeScreen> {
         }),
         _serviceBox(context, "assets/archivos-y-carpetas.png",
             "Solicitud de Revisión de Calificación", () {}),
-        _serviceBox(context, "assets/buscar.png", "Buscar Horarios", () {
+        _serviceBox(
+            context, "assets/buscar.png", "Buscar informaciones de grupos", () {
           showSearch(context: context, delegate: HoraryDataSearch());
         }),
-        _serviceBox(
-            context, "assets/presentacion.png", "Reservar Aulas", () {}),
+        _serviceBox(context, "assets/presentacion.png",
+            "Reservar aula de Audiovisuales", () {}),
         _serviceBox(
             context, "assets/proyector.png", "Reservar Proyectores", () {}),
-        _serviceBox(context, "assets/grupo.png", "Solicitar grupo", () {}),
+        _serviceBox(context, "assets/grupo.png",
+            "Solicitar grupo para asignatura", () {}),
       ],
     );
   }
@@ -163,63 +176,61 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildInformationTitle(Payload userData) {
-    final boldText = TextStyle(fontWeight: FontWeight.bold);
-
     return Container(
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text("UNIVERSIDAD TECNOLOGICA DE SANTIAGO"),
+          RichText(
+              text: TextSpan(
+                  text: "RECINTO: ",
+                  style: TextStyle(color: Colors.black54),
+                  children: [
+                TextSpan(
+                    text: userData.enclosureName.toUpperCase(),
+                    style: TextStyle(color: Colors.black87))
+              ])),
           SizedBox(height: 5.0),
-          Text("(UTESA)"),
+          RichText(
+              text: TextSpan(
+                  text: "CARRERA: ",
+                  style: TextStyle(color: Colors.black54),
+                  children: [
+                TextSpan(
+                    text: userData.pensumTitle.toUpperCase(),
+                    style: TextStyle(color: Colors.black87))
+              ])),
           SizedBox(height: 5.0),
-          Text(userData.enclosureName.toUpperCase(), style: boldText),
+          RichText(
+              text: TextSpan(
+                  text: "MATRICULA: ",
+                  style: TextStyle(color: Colors.black54),
+                  children: [
+                TextSpan(
+                    text: userData.matricula.toString(),
+                    style: TextStyle(color: Colors.black87))
+              ])),
           SizedBox(height: 5.0),
-          Text(userData.pensumTitle.toUpperCase()),
-          SizedBox(height: 15.0),
-          Text(userData.firstname + " " + userData.lastname, style: boldText),
+          RichText(
+              text: TextSpan(
+                  text: "ESTUDIANTE: ",
+                  style: TextStyle(color: Colors.black54),
+                  children: [
+                TextSpan(
+                    text: userData.firstname + " " + userData.lastname,
+                    style: TextStyle(color: Colors.black87))
+              ])),
         ],
       ),
     );
   }
 
   Widget _buildInformationBody(Payload userData) {
-    final boldText = TextStyle(fontWeight: FontWeight.bold);
+    final boldText = TextStyle();
 
     return Container(
       child: Column(
         children: <Widget>[
-          Text("DURACIÓN", style: boldText),
-          LinearProgressIndicator(
-            value: 1,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text("PERIODOS", style: boldText),
-                  Text("12"),
-                ],
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text("TEORIA (HT)", style: boldText),
-                  Text("196"),
-                ],
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text("PRACTICA (HP)", style: boldText),
-                  Text("86"),
-                ],
-              )
-            ],
-          ),
-          SizedBox(height: 10.0),
           Text("CREDITOS (50 PENDIENTES)", style: boldText),
           LinearProgressIndicator(
             value: 0.7,
@@ -287,34 +298,29 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildQualification(Payload userData) {
-    return Material(
-      color: Colors.white,
-      elevation: 1.0,
-      child: Container(
-        child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          Text("PROYECTO 1"),
-          Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text("1P"),
-                Text("2P"),
-                Text("3P"),
-                Text("10P"),
-                Text("NF"),
-                Text("EQ"),
-              ]),
-          Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text("20"),
-                Text("20"),
-                Text("20"),
-                Text("10"),
-                Text("70"),
-                Text("C"),
-              ])
-        ]),
-      ),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+          columns: [
+            DataColumn(label: Text("CLAVE")),
+            DataColumn(label: Text("ASIGNATURA")),
+            DataColumn(label: Text("1P")),
+            DataColumn(label: Text("2P")),
+            DataColumn(label: Text("3P")),
+            DataColumn(label: Text("NF")),
+            DataColumn(label: Text("EQ")),
+          ],
+          rows: userData.qualification.map((nota) {
+            return DataRow(cells: [
+              DataCell(Text(nota.grupo)),
+              DataCell(Text(nota.materia)),
+              DataCell(Text(nota.the1P == null ? '' : nota.the1P.toString())),
+              DataCell(Text(nota.the2P == null ? '' : nota.the1P.toString())),
+              DataCell(Text(nota.the3P == null ? '' : nota.the1P.toString())),
+              DataCell(Text(nota.nf == null ? '' : nota.nf.toString())),
+              DataCell(Text(nota.eq == null ? '' : nota.eq.toString()))
+            ]);
+          }).toList()),
     );
   }
 }
