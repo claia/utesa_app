@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'package:midoriiro/models/payload.model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:midoriiro/models/payload.model.dart';
+export 'package:midoriiro/models/payload.model.dart';
 
 class DecodeToken {
   Payload _getPayload(String token) {

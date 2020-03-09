@@ -1,10 +1,10 @@
 import 'package:http/http.dart';
 import 'package:midoriiro/models/login.model.dart';
+import 'package:midoriiro/services/api.service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginService {
-  // final String url = "https://utesawebservice.herokuapp.com";
-  final String url = "http://10.0.0.7:8080";
+  final String url = ApiService.url;
 
   Future<int> submit(studentid, password, enclosuresid) async {
     try {

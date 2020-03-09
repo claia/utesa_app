@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:midoriiro/screens/checkQualificationRequest.screen.dart';
 import 'package:midoriiro/screens/group.screen.dart';
 
 /* pantallas */
@@ -19,6 +20,8 @@ class App extends StatelessWidget {
         "login": (context) => LoginScreen(),
         "home": (context) => HomeScreen(),
         "requestDocuments": (context) => RequestDocumentScreen(),
+        "checkQualificationRequests": (context) =>
+            CheckQualificationRequestScreen(),
         "group": (context) => GroupScreen()
       },
     );

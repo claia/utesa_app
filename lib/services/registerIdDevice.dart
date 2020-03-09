@@ -1,11 +1,11 @@
 import 'package:http/http.dart' as http;
 import 'package:midoriiro/models/payload.model.dart';
 import 'package:midoriiro/scripts/decodeToken.dart';
+import 'package:midoriiro/services/api.service.dart';
 
 class RegisterIdDevice {
   final _decodeToken = DecodeToken();
-  // final String url = "https://utesawebservice.herokuapp.com";
-  final String url = "http://10.0.0.7:8080";
+  final String url = ApiService.url;
 
   setIdDevice(String code) async {
     Payload userData = await _decodeToken.getTokenPayload();

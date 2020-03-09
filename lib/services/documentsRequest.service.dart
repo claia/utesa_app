@@ -2,15 +2,15 @@ import 'package:http/http.dart' as http;
 import 'package:midoriiro/models/documents.model.dart';
 export 'package:midoriiro/models/documents.model.dart';
 import 'package:midoriiro/models/documentsRequest.model.dart';
+
+import 'api.service.dart';
 export 'package:midoriiro/models/documentsRequest.model.dart';
 
 class DocumentsRequestService {
-  // String url = "https://utesawebservice.herokuapp.com";
-  final String url = "http://10.0.0.7:8080";
+  final String url = ApiService.url;
 
-  Future<List<DocumentsRequestModel>> getDocumentsRequest(int studentid) async {
-    final res =
-        await http.get("$url/api/documentsRequests/documents/$studentid");
+  Future<List<DocumentsRequestModel>> getDocumentsRequest(int userid) async {
+    final res = await http.get("$url/api/documentsRequests/documents/$userid");
 
     if (res.statusCode == 200)
       return documentsRequestModelFromJson(res.body);

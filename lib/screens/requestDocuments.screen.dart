@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:midoriiro/models/documents.model.dart';
-import 'package:midoriiro/states/documentsRequest.state.dart';
+import 'package:midoriiro/scripts/decodeToken.dart';
+import 'package:midoriiro/services/documentsRequest.service.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 
 class RequestDocumentScreen extends StatefulWidget {
@@ -9,9 +10,11 @@ class RequestDocumentScreen extends StatefulWidget {
 }
 
 class _RequestDocumentScreenState extends State<RequestDocumentScreen> {
-  final _documentsRequestState = DocumentsRequestState();
+  final _documentsRequestService = DocumentsRequestService();
 
   final _formKey = GlobalKey<FormState>();
+
+  final _decodeToken = DecodeToken();
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -19,8 +22,8 @@ class _RequestDocumentScreenState extends State<RequestDocumentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Payload>(
-        stream: _documentsRequestState.payloadStream,
+    return FutureBuilder<Payload>(
+        future: _decodeToken.getTokenPayload(),
         builder: (context, snapshot) {
           if (!snapshot.hasData)
             return Center(child: CircularProgressIndicator());
@@ -51,7 +54,12 @@ class _RequestDocumentScreenState extends State<RequestDocumentScreen> {
   }
 
   _buildBody(Payload payload) {
-    return _documentsRequestList(payload);
+    return RefreshIndicator(
+        onRefresh: () async {
+          await _decodeToken.getTokenPayload();
+          setState(() {});
+        },
+        child: _documentsRequestList(payload));
   }
 
   Widget _documentsRequestList(Payload payload) {
@@ -64,10 +72,10 @@ class _RequestDocumentScreenState extends State<RequestDocumentScreen> {
       Colors.orange
     ];
 
-    return StreamBuilder<List<DocumentsRequestModel>>(
-        stream: _documentsRequestState.documentRequestStream,
+    return FutureBuilder<List<DocumentsRequestModel>>(
+        future: _documentsRequestService.getDocumentsRequest(payload.userid),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) return LinearProgressIndicator();
+          if (!snapshot.hasData) return CircularProgressIndicator();
           return ListView.separated(
               itemCount: snapshot.data.length,
               separatorBuilder: (context, index) => Divider(),
@@ -93,9 +101,8 @@ class _RequestDocumentScreenState extends State<RequestDocumentScreen> {
                     },
                     onDismissed: (value) {
                       final requestid = snapshot.data[index].requestid;
-                      _documentsRequestState.cancelRequest(requestid);
-                      Future.delayed(Duration(seconds: 1), () {
-                        _documentsRequestState.emitDataLoad();
+                      setState(() {
+                        _documentsRequestService.cancelRequest(requestid);
                       });
                     },
                     child: ListTile(
@@ -103,15 +110,24 @@ class _RequestDocumentScreenState extends State<RequestDocumentScreen> {
                           ? null
                           : () async {
                               String result = await scanner.scan();
-                              final int data = int.parse(result.split(",")[2]);
-                              if (data == 3) {
-                                final requestid =
-                                    snapshot.data[index].requestid;
-                                _documentsRequestState.updateRequest(requestid);
-                                Future.delayed(Duration(seconds: 1), () {
-                                  _documentsRequestState.emitDataLoad();
-                                });
-                              } else {
+                              try {
+                                final int data =
+                                    int.parse(result.split(",")[2]);
+
+                                if (data == 3) {
+                                  final requestid =
+                                      snapshot.data[index].requestid;
+                                  setState(() {
+                                    _documentsRequestService
+                                        .updateRequest(requestid);
+                                  });
+                                } else {
+                                  _scaffoldKey.currentState.showSnackBar(
+                                      SnackBar(
+                                          content:
+                                              Text("CÓDIGO QR NO VÁLIDO")));
+                                }
+                              } catch (e) {
                                 _scaffoldKey.currentState.showSnackBar(SnackBar(
                                     content: Text("CÓDIGO QR NO VÁLIDO")));
                               }
@@ -156,10 +172,9 @@ class _RequestDocumentScreenState extends State<RequestDocumentScreen> {
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          return StreamBuilder(
-            stream: _documentsRequestState.documentStream,
-            builder: (BuildContext context,
-                AsyncSnapshot<List<DocumentsModel>> snapshot) {
+          return FutureBuilder<List<DocumentsModel>>(
+            future: _documentsRequestService.getDocuments(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (!snapshot.hasData)
                 return Center(child: CircularProgressIndicator());
 
@@ -204,14 +219,13 @@ class _RequestDocumentScreenState extends State<RequestDocumentScreen> {
                                           onPressed: () {
                                             if (_formKey.currentState
                                                 .validate()) {
-                                              _documentsRequestState.addRequest(
-                                                  payload.userid,
-                                                  snapshot.data[index].id,
-                                                  _inputController.value.text);
-                                              Future.delayed(
-                                                  Duration(seconds: 1), () {
-                                                _documentsRequestState
-                                                    .emitDataLoad();
+                                              setState(() {
+                                                _documentsRequestService
+                                                    .addDocumentsRequest(
+                                                        payload.userid,
+                                                        snapshot.data[index].id,
+                                                        _inputController
+                                                            .value.text);
                                               });
                                               Navigator.pop(context);
                                             }

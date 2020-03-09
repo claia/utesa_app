@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:midoriiro/scripts/decodeToken.dart';
 import 'package:midoriiro/searchs/horaryExplore.search.dart';
 import 'package:midoriiro/services/push_notifications.service.dart';
-import 'package:midoriiro/states/home.state.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -12,20 +11,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _pushNotificationService = PushNotificationService();
-  // final _loginService = LoginService();
-  HomeState _homeState;
+  final _decodeToken = DecodeToken();
 
   @override
   void initState() {
     super.initState();
     _pushNotificationService.initNotification();
-    _homeState = HomeState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _homeState.dispose();
   }
 
   @override
@@ -74,8 +65,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _estudiante() {
-    return StreamBuilder<Payload>(
-      stream: _homeState.tokenStream,
+    return FutureBuilder<Payload>(
+      future: _decodeToken.getTokenPayload(),
       builder: (BuildContext context, AsyncSnapshot<Payload> snapshot) {
         if (!snapshot.hasData)
           return Center(child: CircularProgressIndicator());
@@ -117,15 +108,17 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisCount: 2,
       children: <Widget>[
         _serviceBox(context, "assets/documento.png", "Solicitud de Documentos",
-            () {
-          Navigator.pushNamed(context, "requestDocuments");
-        }),
-        _serviceBox(context, "assets/archivos-y-carpetas.png",
-            "Solicitud de Revisión de Calificación", () {}),
+            () => Navigator.pushNamed(context, "requestDocuments")),
         _serviceBox(
-            context, "assets/buscar.png", "Buscar informaciones de grupos", () {
-          showSearch(context: context, delegate: HoraryDataSearch());
-        }),
+            context,
+            "assets/archivos-y-carpetas.png",
+            "Solicitud de Revisión de Calificación",
+            () => Navigator.pushNamed(context, "checkQualificationRequests")),
+        _serviceBox(
+            context,
+            "assets/buscar.png",
+            "Buscar informaciones de grupos",
+            () => showSearch(context: context, delegate: HoraryDataSearch())),
         _serviceBox(context, "assets/presentacion.png",
             "Reservar aula de Audiovisuales", () {}),
         _serviceBox(
