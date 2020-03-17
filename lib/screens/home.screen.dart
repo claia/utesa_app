@@ -123,8 +123,11 @@ class _HomeScreenState extends State<HomeScreen> {
             "Reservar aula de Audiovisuales", () {}),
         _serviceBox(
             context, "assets/proyector.png", "Reservar Proyectores", () {}),
-        _serviceBox(context, "assets/grupo.png",
-            "Solicitar grupo para asignatura", () {}),
+        _serviceBox(
+            context,
+            "assets/grupo.png",
+            "Solicitud de grupo para asignatura",
+            () => Navigator.of(context).pushNamed("newGroupRequest")),
       ],
     );
   }
@@ -306,7 +309,11 @@ class _HomeScreenState extends State<HomeScreen> {
           rows: userData.qualification.map((nota) {
             return DataRow(cells: [
               DataCell(Text(nota.grupo)),
-              DataCell(Text(nota.materia)),
+              DataCell(Text(nota.materia),
+                  onTap: () => showSearch(
+                      context: context,
+                      delegate: HoraryDataSearch(),
+                      query: nota.grupo)),
               DataCell(Text(nota.the1P == null ? '' : nota.the1P.toString())),
               DataCell(Text(nota.the2P == null ? '' : nota.the1P.toString())),
               DataCell(Text(nota.the3P == null ? '' : nota.the1P.toString())),

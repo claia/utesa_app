@@ -5,6 +5,7 @@ import 'package:midoriiro/screens/group.screen.dart';
 /* pantallas */
 import 'package:midoriiro/screens/home.screen.dart';
 import 'package:midoriiro/screens/login.screen.dart';
+import 'package:midoriiro/screens/newGroupRequest.screen.dart';
 import 'package:midoriiro/screens/requestDocuments.screen.dart';
 
 void main() => runApp(App());
@@ -22,7 +23,8 @@ class App extends StatelessWidget {
         "requestDocuments": (context) => RequestDocumentScreen(),
         "checkQualificationRequests": (context) =>
             CheckQualificationRequestScreen(),
-        "group": (context) => GroupScreen()
+        "group": (context) => GroupScreen(),
+        "newGroupRequest": (context) => NewGroupRequest()
       },
     );
   }

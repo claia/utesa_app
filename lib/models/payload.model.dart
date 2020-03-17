@@ -16,6 +16,7 @@ class Payload {
   final String firstname;
   final String lastname;
   final String pensumTitle;
+  final int pensumId;
   final String enclosureName;
   final List<Qualification> qualification;
   final int iat;
@@ -28,6 +29,7 @@ class Payload {
     @required this.firstname,
     @required this.lastname,
     @required this.pensumTitle,
+    @required this.pensumId,
     @required this.enclosureName,
     @required this.qualification,
     @required this.iat,
@@ -41,6 +43,7 @@ class Payload {
         firstname: json["firstname"],
         lastname: json["lastname"],
         pensumTitle: json["pensum_title"],
+        pensumId: json["pensum_id"],
         enclosureName: json["enclosure_name"],
         qualification: List<Qualification>.from(
             json["qualification"].map((x) => Qualification.fromMap(x))),
@@ -55,6 +58,7 @@ class Payload {
         "firstname": firstname,
         "lastname": lastname,
         "pensum_title": pensumTitle,
+        "pensum_id": pensumId,
         "enclosure_name": enclosureName,
         "qualification":
             List<dynamic>.from(qualification.map((x) => x.toMap())),

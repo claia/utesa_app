@@ -8,9 +8,11 @@ export 'package:midoriiro/models/documentsRequest.model.dart';
 
 class DocumentsRequestService {
   final String url = ApiService.url;
+  List statusRequest = [1, 2, 3, 4, 5, 6, 7];
 
   Future<List<DocumentsRequestModel>> getDocumentsRequest(int userid) async {
-    final res = await http.get("$url/api/documentsRequests/documents/$userid");
+    final res = await http.get("$url/api/documentsRequests/documents/all",
+        headers: {"id": userid.toString(), "status": statusRequest.toString()});
 
     if (res.statusCode == 200)
       return documentsRequestModelFromJson(res.body);

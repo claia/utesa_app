@@ -17,12 +17,14 @@ class DocumentsModel {
   final String description;
   final bool status;
   final int documentTypeId;
+  final int price;
 
   DocumentsModel({
     @required this.id,
     @required this.description,
     @required this.status,
     @required this.documentTypeId,
+    @required this.price,
   });
 
   factory DocumentsModel.fromMap(Map<String, dynamic> json) => DocumentsModel(
@@ -30,6 +32,7 @@ class DocumentsModel {
         description: json["description"],
         status: json["status"],
         documentTypeId: json["documentTypeId"],
+        price: json["price"],
       );
 
   Map<String, dynamic> toMap() => {
@@ -37,5 +40,6 @@ class DocumentsModel {
         "description": description,
         "status": status,
         "documentTypeId": documentTypeId,
+        "price": price,
       };
 }

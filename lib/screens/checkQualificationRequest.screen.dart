@@ -25,7 +25,8 @@ class _CheckQualificationRequestScreenState
     Colors.red,
     Colors.red,
     Colors.green,
-    Colors.orange
+    Colors.orange,
+    Colors.purple
   ];
 
   @override
@@ -40,7 +41,65 @@ class _CheckQualificationRequestScreenState
                   "Solicitud de revisión de calificaciones".toUpperCase(),
                   style: TextStyle(color: Colors.white))),
           actions: <Widget>[
-            IconButton(icon: Icon(Icons.info_outline), onPressed: () {})
+            PopupMenuButton(
+                onSelected: (value) {
+                  switch (value) {
+                    case 2:
+                      setState(() {
+                        _checkQualificationRequestService.statusRequest = [4];
+                      });
+
+                      break;
+                    case 3:
+                      setState(() {
+                        _checkQualificationRequestService.statusRequest = [7];
+                      });
+
+                      break;
+                    case 4:
+                      setState(() {
+                        _checkQualificationRequestService.statusRequest = [6];
+                      });
+
+                      break;
+                    case 5:
+                      setState(() {
+                        _checkQualificationRequestService.statusRequest = [1];
+                      });
+
+                      break;
+                    case 6:
+                      setState(() {
+                        _checkQualificationRequestService.statusRequest = [5];
+                      });
+
+                      break;
+                    default:
+                      setState(() {
+                        _checkQualificationRequestService.statusRequest = [
+                          1,
+                          2,
+                          3,
+                          4,
+                          5,
+                          6,
+                          7
+                        ];
+                      });
+                  }
+                },
+                icon: Icon(Icons.filter_list),
+                itemBuilder: (context) {
+                  return [
+                    PopupMenuItem(value: 1, child: Text("Ver Todas")),
+                    PopupMenuItem(value: 2, child: Text("Ver Canceladas")),
+                    PopupMenuItem(value: 3, child: Text("Ver En Espera")),
+                    PopupMenuItem(
+                        value: 4, child: Text("Ver Pendientes De Pago")),
+                    PopupMenuItem(value: 5, child: Text("Ver En Proceso")),
+                    PopupMenuItem(value: 6, child: Text("Ver Completadas")),
+                  ];
+                })
           ],
         ),
         body: _buildBody(),
@@ -51,7 +110,8 @@ class _CheckQualificationRequestScreenState
     return FutureBuilder(
       future: _decodeToken.getTokenPayload(),
       builder: (BuildContext context, AsyncSnapshot<Payload> snapshot) {
-        if (!snapshot.hasData) return CircularProgressIndicator();
+        if (!snapshot.hasData)
+          return Center(child: CircularProgressIndicator());
 
         return RefreshIndicator(
           onRefresh: () async {
@@ -63,14 +123,18 @@ class _CheckQualificationRequestScreenState
                 .getDocumentsRequest(snapshot.data.userid),
             builder: (BuildContext context,
                 AsyncSnapshot<List<CheckQualificationRequestModel>> snapshot) {
-              if (!snapshot.hasData) return CircularProgressIndicator();
+              if (!snapshot.hasData)
+                return Center(child: CircularProgressIndicator());
 
               return ListView.separated(
                 itemCount: snapshot.data.length,
                 separatorBuilder: (context, index) => Divider(),
                 itemBuilder: (context, index) => ListTile(
-                  onLongPress: () =>
-                      showDeleteForm(context, snapshot.data[index]),
+                  onTap: () {},
+                  trailing: showStatusIcon(snapshot.data[index].estadoCode),
+                  onLongPress: snapshot.data[index].estadoCode == 4
+                      ? null
+                      : () => showDeleteForm(context, snapshot.data[index]),
                   title: Text(snapshot.data[index].grupo),
                   subtitle: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -116,6 +180,19 @@ class _CheckQualificationRequestScreenState
     );
   }
 
+  Widget showStatusIcon(int status) {
+    switch (status) {
+      case 7:
+        return Icon(Icons.timer);
+        break;
+      case 4:
+        return Icon(Icons.clear);
+        break;
+      default:
+        return Icon(Icons.check);
+    }
+  }
+
   Widget _buildFloatingActionButton(BuildContext context) {
     return FloatingActionButton(
         child: Icon(Icons.add),
@@ -129,35 +206,43 @@ class _CheckQualificationRequestScreenState
   }
 
   Widget _bottomSheetMenu() {
-    return FutureBuilder(
-      future: _decodeToken.getTokenPayload(),
-      builder: (BuildContext context, AsyncSnapshot<Payload> snapshot) {
-        if (!snapshot.hasData)
-          return Center(child: CircularProgressIndicator());
+    return Column(
+      children: <Widget>[
+        Divider(),
+        Text("ASIGNATURAS DISPONIBLES"),
+        Divider(),
+        FutureBuilder(
+          future: _decodeToken.getTokenPayload(),
+          builder: (BuildContext context, AsyncSnapshot<Payload> snapshot) {
+            if (!snapshot.hasData) return LinearProgressIndicator();
 
-        final payload = snapshot.data;
+            final payload = snapshot.data;
 
-        return FutureBuilder(
-          future:
-              _checkQualificationRequestService.getGroups(payload.studentid),
-          builder: (BuildContext context,
-              AsyncSnapshot<List<GroupsCheckQualificationModel>> snapshot) {
-            if (!snapshot.hasData)
-              return Center(child: CircularProgressIndicator());
+            return FutureBuilder(
+              future: _checkQualificationRequestService
+                  .getGroups(payload.studentid),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<GroupsCheckQualificationModel>> snapshot) {
+                if (!snapshot.hasData) return LinearProgressIndicator();
 
-            return ListView.separated(
-              itemCount: snapshot.data.length,
-              separatorBuilder: (context, index) => Divider(),
-              itemBuilder: (context, index) => ListTile(
-                title: Text(snapshot.data[index].grupo),
-                subtitle: Text(snapshot.data[index].name),
-                trailing: Icon(Icons.add),
-                onTap: () => showForm(context, payload, snapshot.data[index]),
-              ),
+                return Expanded(
+                  child: ListView.separated(
+                    itemCount: snapshot.data.length,
+                    separatorBuilder: (context, index) => Divider(),
+                    itemBuilder: (context, index) => ListTile(
+                      title: Text(snapshot.data[index].grupo),
+                      subtitle: Text(snapshot.data[index].name),
+                      trailing: Icon(Icons.add),
+                      onTap: () =>
+                          showForm(context, payload, snapshot.data[index]),
+                    ),
+                  ),
+                );
+              },
             );
           },
-        );
-      },
+        ),
+      ],
     );
   }
 
@@ -191,7 +276,6 @@ class _CheckQualificationRequestScreenState
                 )),
             actions: <Widget>[
               FlatButton(
-                textColor: Colors.red,
                 child: Text("Cancelar".toUpperCase()),
                 onPressed: () {
                   setState(() {
@@ -200,6 +284,7 @@ class _CheckQualificationRequestScreenState
                 },
               ),
               FlatButton(
+                textColor: Colors.amber,
                 child: Text("solicitar".toUpperCase()),
                 onPressed: () {
                   setState(() {
@@ -225,13 +310,13 @@ class _CheckQualificationRequestScreenState
             title: Text("¿CANCELAR SOLICITUD?"),
             actions: <Widget>[
               FlatButton(
-                textColor: Colors.red,
                 child: Text("CANCELAR"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               FlatButton(
+                textColor: Colors.red,
                 child: Text("ACEPTAR"),
                 onPressed: () {
                   _checkQualificationRequestService

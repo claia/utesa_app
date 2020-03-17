@@ -5,11 +5,15 @@ import 'package:midoriiro/services/api.service.dart';
 
 class CheckQualificationRequestService {
   final String url = ApiService.url;
+  List statusRequest = [1, 2, 3, 4, 5, 6, 7];
 
   Future<List<CheckQualificationRequestModel>> getDocumentsRequest(
       int userid) async {
-    final res =
-        await http.get("$url/api/checkQualificationRequests/requests/$userid");
+    final res = await http.get("$url/api/checkQualificationRequests/requests",
+        headers: {
+          "userid": userid.toString(),
+          "status": statusRequest.toString()
+        });
 
     if (res.statusCode == 200)
       return checkQualificationRequestModelFromJson(res.body);
@@ -36,6 +40,16 @@ class CheckQualificationRequestService {
     else
       print(res.body.toString());
     return false;
+  }
+
+  Future<bool> updateRequest(int requestid) async {
+    final res = await http.put("$url/api/checkQualificationRequests/",
+        headers: {"requestid": requestid.toString()});
+
+    if (res.statusCode == 200)
+      return true;
+    else
+      throw "Error" + res.statusCode.toString();
   }
 
   Future<bool> addRequest(int userid, int groupid, String razon) async {

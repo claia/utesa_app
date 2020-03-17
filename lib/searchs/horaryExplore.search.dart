@@ -96,6 +96,15 @@ class HoraryDataSearch extends SearchDelegate {
                           text: snapshot.data[index].profesor,
                           style: TextStyle(color: Colors.black87))
                     ])),
+                RichText(
+                    text: TextSpan(
+                        text: "COMENTARIOS: ",
+                        style: TextStyle(color: Colors.black54),
+                        children: [
+                      TextSpan(
+                          text: snapshot.data[index].comments,
+                          style: TextStyle(color: Colors.black87))
+                    ])),
               ],
             ),
             onTap: () {

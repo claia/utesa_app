@@ -15,6 +15,9 @@ class GroupModel {
   final int grupoId;
   final String ciclo;
   final String claveMateria;
+  final String likes;
+  final String dislikes;
+  final String comments;
   final String nombreMateria;
   final String profesor;
   final String horario;
@@ -24,6 +27,9 @@ class GroupModel {
     @required this.grupoId,
     @required this.ciclo,
     @required this.claveMateria,
+    @required this.likes,
+    @required this.dislikes,
+    @required this.comments,
     @required this.nombreMateria,
     @required this.profesor,
     @required this.horario,
@@ -34,6 +40,9 @@ class GroupModel {
         grupoId: json["grupo_id"],
         ciclo: json["ciclo"],
         claveMateria: json["clave_materia"],
+        likes: json["likes"],
+        dislikes: json["dislikes"],
+        comments: json["comments"],
         nombreMateria: json["nombre_materia"],
         profesor: json["profesor"],
         horario: json["horario"],
@@ -44,6 +53,9 @@ class GroupModel {
         "grupo_id": grupoId,
         "ciclo": ciclo,
         "clave_materia": claveMateria,
+        "likes": likes,
+        "dislikes": dislikes,
+        "comments": comments,
         "nombre_materia": nombreMateria,
         "profesor": profesor,
         "horario": horario,
